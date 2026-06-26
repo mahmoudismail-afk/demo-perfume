@@ -1,0 +1,25 @@
+/* Main App specific styles */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+section {
+  padding: 4rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  section {
+    padding: 6rem 3rem;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}

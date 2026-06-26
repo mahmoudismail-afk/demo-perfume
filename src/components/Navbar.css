@@ -1,0 +1,95 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.5rem 2rem;
+  z-index: 1000;
+  transition: var(--transition-smooth);
+  color: var(--color-white);
+}
+
+.navbar.scrolled {
+  background-color: rgba(5, 5, 5, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.logo-icon {
+  font-size: 1.5rem;
+}
+
+.logo-text {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  letter-spacing: 0.15em;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navbar-actions button {
+  color: inherit;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-actions button:hover {
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1.5rem 1rem;
+  }
+  .navbar.scrolled {
+    padding: 1rem 1rem;
+  }
+  .navbar-actions {
+    gap: 1rem;
+  }
+  .logo-text {
+    display: none; /* Hide text on mobile for cleaner look as in video */
+  }
+}
+
+.icon-badge-container {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

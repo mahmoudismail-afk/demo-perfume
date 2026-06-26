@@ -1,0 +1,8 @@
+name = "perfume-website"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-03-20"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "jamaludeen-perfumes"
+database_id = "85e40a6b-1220-4117-ba7e-8817ee3e2109"

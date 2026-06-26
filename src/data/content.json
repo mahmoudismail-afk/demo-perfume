@@ -1,0 +1,117 @@
+{
+  "site": {
+    "name": "JAMALUDEEN",
+    "fullName": "JAMALUDEEN PERFUMES",
+    "tagline": "SIGNATURE SCENTS",
+    "footerText": "Crafting exceptional fragrances that capture the essence of elegance."
+  },
+  "hero": {
+    "backgroundImage": "/images/hero_background.png"
+  },
+  "discover": {
+    "title": "Discover Your Signature Scent",
+    "description": "Experience the art of fine fragrance with our carefully curated collection of premium perfumes that tell your unique story.",
+    "buttonText": "Explore Collections",
+    "buttonHref": "#collections"
+  },
+  "bestSellers": {
+    "title": "Our Best Sellers",
+    "subtitle": "Discover the fragrances our customers love the most",
+    "products": [
+      {
+        "id": "1",
+        "name": "Y by YSL",
+        "badge": "Bestseller",
+        "image": "/images/product_ysl.png",
+        "rating": 5.0,
+        "price": "$250",
+        "originalPrice": "",
+        "collectionId": "for-him",
+        "scentFamily": "Fresh"
+      },
+      {
+        "id": "2",
+        "name": "MALE LE PARFUM",
+        "badge": "Bestseller",
+        "image": "/images/product_le_male.png",
+        "rating": 4.9,
+        "price": "$250",
+        "originalPrice": "",
+        "collectionId": "for-him",
+        "scentFamily": "Amber"
+      },
+      {
+        "id": "3",
+        "name": "MALE ELIXIR",
+        "badge": "Bestseller",
+        "image": "/images/product_le_male.png",
+        "rating": 4.8,
+        "price": "$250",
+        "originalPrice": "",
+        "collectionId": "for-him",
+        "scentFamily": "Spicy"
+      },
+      {
+        "id": "4",
+        "name": "Miss Dior",
+        "badge": "Bestseller",
+        "image": "/images/product_dior.png",
+        "rating": 5.0,
+        "price": "$250",
+        "originalPrice": "",
+        "collectionId": "for-her",
+        "scentFamily": "Floral"
+      }
+    ]
+  },
+  "collections": {
+    "title": "Our Collections",
+    "subtitle": "Discover our four distinctive fragrance collections, each crafted to capture the essence of elegance and sophistication.",
+    "items": [
+      {
+        "id": "for-him",
+        "title": "For HIM",
+        "image": "/images/collection_him.png"
+      },
+      {
+        "id": "for-her",
+        "title": "For Her",
+        "image": "/images/collection_her.png"
+      },
+      {
+        "id": "bundles",
+        "title": "OUR BUNDLES",
+        "image": "/images/collection_bundles.png"
+      },
+      {
+        "id": "outlet",
+        "title": "OUTLET COLLECTION",
+        "image": "/images/collection_outlet.png"
+      }
+    ]
+  },
+  "about": {
+    "title": "The Art of Fragrance",
+    "paragraphs": [
+      "At Jamaludeen Perfumes, we believe that every scent tells a story. Our master perfumers craft each fragrance with precision and passion, using only the finest ingredients sourced from around the world.",
+      "From the first spritz to the lasting impression, our perfumes are designed to evoke emotions, create memories, and express your unique personality."
+    ],
+    "buttonText": "Learn More About Us",
+    "buttonHref": "#contact",
+    "image": "/images/art_of_fragrance.png"
+  },
+  "navigation": {
+    "main": [
+      { "label": "Home", "href": "#home" },
+      { "label": "About", "href": "#about" },
+      { "label": "Products", "href": "#products" },
+      { "label": "Contact", "href": "#contact" }
+    ],
+    "collections": [
+      { "label": "For Him", "href": "/collections/for-him" },
+      { "label": "For Her", "href": "/collections/for-her" },
+      { "label": "Bundles", "href": "/collections/bundles" },
+      { "label": "Outlets", "href": "/collections/outlet" }
+    ]
+  }
+}

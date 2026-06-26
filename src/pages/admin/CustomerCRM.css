@@ -1,0 +1,64 @@
+.crm-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fade-in var(--transition-smooth);
+}
+
+.crm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crm-header h1 {
+  font-family: var(--font-serif);
+  margin: 0;
+  color: var(--color-black);
+}
+
+.crm-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.crm-filters input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+}
+
+.crm-filters input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.ltv-badge {
+  background: var(--color-black);
+  color: var(--color-white);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.customer-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--color-text-light);
+  margin-right: 1rem;
+}
+
+.customer-name-cell {
+  display: flex;
+  align-items: center;
+}
