@@ -8,10 +8,25 @@ export const useStore = () => useContext(StoreContext);
 export const StoreProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [isCartOpenState, setIsCartOpenState] = useState(false);
+  const [isWishlistOpenState, setIsWishlistOpenState] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [wishlistItems, setWishlistItems] = useState([]);
+  const [customer, setCustomer] = useState(null);
+  const isAuthenticated = !!customer;
+
+  const isCartOpen = isCartOpenState;
+  const isWishlistOpen = isWishlistOpenState;
+
+  const setIsCartOpen = (isOpen) => {
+    setIsCartOpenState(isOpen);
+    if (isOpen) setIsWishlistOpenState(false);
+  };
+
+  const setIsWishlistOpen = (isOpen) => {
+    setIsWishlistOpenState(isOpen);
+    if (isOpen) setIsCartOpenState(false);
+  };
   
   // Product Modal State
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -35,9 +50,37 @@ export const StoreProvider = ({ children }) => {
 
     const savedCart = localStorage.getItem('cartItems');
     const savedWishlist = localStorage.getItem('wishlistItems');
+    const token = localStorage.getItem('authToken');
+    
     if (savedCart) setCartItems(JSON.parse(savedCart));
     if (savedWishlist) setWishlistItems(JSON.parse(savedWishlist));
+    if (token) loadCustomerProfile(token);
   }, []);
+
+  const loadCustomerProfile = async (token) => {
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      if (data.success && data.customer) {
+        setCustomer(data.customer);
+      } else {
+        // Token is invalid or expired
+        localStorage.removeItem('authToken');
+        setCustomer(null);
+      }
+    } catch (err) {
+      console.error('Failed to load profile', err);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('authToken');
+    setCustomer(null);
+  };
 
   // Save cart & wishlist to local storage on change
   useEffect(() => {
@@ -183,7 +226,11 @@ export const StoreProvider = ({ children }) => {
     selectedProduct,
     isModalOpen,
     openProductModal,
-    closeProductModal
+    closeProductModal,
+    customer,
+    isAuthenticated,
+    loadCustomerProfile,
+    logout
   };
 
   return (

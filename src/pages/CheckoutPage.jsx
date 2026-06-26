@@ -178,7 +178,7 @@ const CheckoutPage = () => {
               {cartItems.map((item, index) => (
                 <div key={item.id + index} className="summary-item">
                   <div className="summary-item-image">
-                    <img src={item.image} alt={item.name} />
+                    <img src={item.image} alt={item.name} loading="lazy" />
                     <span className="item-quantity-badge">{item.quantity}</span>
                   </div>
                   <div className="summary-item-details">

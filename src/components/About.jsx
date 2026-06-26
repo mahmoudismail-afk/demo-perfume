@@ -17,7 +17,7 @@ const About = ({ data }) => {
           </div>
           
           <div className="about-image-wrapper fade-in-section">
-            <img src={data.image} alt="Art of Fragrance" className="about-image" />
+            <img src={data.image} alt="Art of Fragrance" className="about-image" loading="lazy" />
           </div>
         </div>
       </div>

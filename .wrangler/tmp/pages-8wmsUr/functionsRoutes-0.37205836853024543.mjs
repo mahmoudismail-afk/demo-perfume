@@ -1,4 +1,7 @@
 import { onRequestPost as __api_admin_login_js_onRequestPost } from "C:\\WEB\\perfume website\\functions\\api\\admin\\login.js"
+import { onRequestPost as __api_auth_login_js_onRequestPost } from "C:\\WEB\\perfume website\\functions\\api\\auth\\login.js"
+import { onRequestGet as __api_auth_me_js_onRequestGet } from "C:\\WEB\\perfume website\\functions\\api\\auth\\me.js"
+import { onRequestPost as __api_auth_signup_js_onRequestPost } from "C:\\WEB\\perfume website\\functions\\api\\auth\\signup.js"
 import { onRequestGet as __api_inventory_low_stock_js_onRequestGet } from "C:\\WEB\\perfume website\\functions\\api\\inventory\\low-stock.js"
 import { onRequestPut as __api_orders_status_js_onRequestPut } from "C:\\WEB\\perfume website\\functions\\api\\orders\\status.js"
 import { onRequestPost as __api_promotions_apply_js_onRequestPost } from "C:\\WEB\\perfume website\\functions\\api\\promotions\\apply.js"
@@ -15,6 +18,27 @@ export const routes = [
       method: "POST",
       middlewares: [],
       modules: [__api_admin_login_js_onRequestPost],
+    },
+  {
+      routePath: "/api/auth/login",
+      mountPath: "/api/auth",
+      method: "POST",
+      middlewares: [],
+      modules: [__api_auth_login_js_onRequestPost],
+    },
+  {
+      routePath: "/api/auth/me",
+      mountPath: "/api/auth",
+      method: "GET",
+      middlewares: [],
+      modules: [__api_auth_me_js_onRequestGet],
+    },
+  {
+      routePath: "/api/auth/signup",
+      mountPath: "/api/auth",
+      method: "POST",
+      middlewares: [],
+      modules: [__api_auth_signup_js_onRequestPost],
     },
   {
       routePath: "/api/inventory/low-stock",

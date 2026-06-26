@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { X, Lock, User, Phone, Key } from 'lucide-react';
+import { X, Lock, User, Phone } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import './AuthModal.css';
 
 const AuthModal = () => {
-  const { isAuthOpen, setIsAuthOpen } = useStore();
+  const { isAuthOpen, setIsAuthOpen, loadCustomerProfile } = useStore();
   const [isLogin, setIsLogin] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -13,29 +13,21 @@ const AuthModal = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    username: '',
     phone: '',
     password: ''
   });
   
-  // OTP states
-  const [otpStep, setOtpStep] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-
   if (!isAuthOpen) return null;
 
   const handleClose = () => {
     setIsAuthOpen(false);
     setTimeout(() => {
-      setOtpStep(false);
       setFormData({
         firstName: '',
         lastName: '',
-        username: '',
         phone: '',
         password: ''
       });
-      setOtpCode('');
       setErrorMsg('');
       setIsLogin(true);
     }, 300);
@@ -49,6 +41,7 @@ const AuthModal = () => {
   const storeToken = (token) => {
     if (token) {
       localStorage.setItem('authToken', token);
+      loadCustomerProfile(token); // Update the global state with new token
     }
   };
 
@@ -63,7 +56,7 @@ const AuthModal = () => {
         const response = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: formData.username, password: formData.password })
+          body: JSON.stringify({ phone: formData.phone, password: formData.password })
         });
         const data = await response.json();
         
@@ -74,42 +67,19 @@ const AuthModal = () => {
           setErrorMsg(data.error || 'Invalid credentials.');
         }
       } else {
-        // Signup & Verification Flow
-        if (!otpStep) {
-          // Trigger OTP
-          const response = await fetch('/api/auth/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-          });
-          const data = await response.json();
-          
-          if (response.ok && data.success) {
-            setOtpStep(true);
-          } else {
-            setErrorMsg(data.error || 'Signup failed. Please try again.');
-          }
+        // Signup Flow
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          storeToken(data.token);
+          handleClose();
         } else {
-          // Verify OTP
-          if (otpCode.length < 4) {
-            setErrorMsg('Please enter a valid OTP code.');
-            setIsSubmitting(false);
-            return;
-          }
-          
-          const response = await fetch('/api/auth/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone: formData.phone, otpCode })
-          });
-          const data = await response.json();
-          
-          if (response.ok && data.success) {
-            storeToken(data.token);
-            handleClose();
-          } else {
-            setErrorMsg(data.error || 'Invalid OTP code.');
-          }
+          setErrorMsg(data.error || 'Signup failed. Please try again.');
         }
       }
     } catch (err) {
@@ -120,43 +90,23 @@ const AuthModal = () => {
     }
   };
 
-  const handleResendOTP = async (e) => {
-    e.preventDefault();
-    setErrorMsg('');
-    try {
-      const response = await fetch('/api/auth/resend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: formData.phone })
-      });
-      const data = await response.json();
-      if (!response.ok || !data.success) {
-        setErrorMsg(data.error || 'Failed to resend OTP.');
-      } else {
-        setErrorMsg('OTP resent successfully!'); // using errorMsg for UI feedback
-      }
-    } catch (err) {
-      setErrorMsg('Network error.');
-    }
-  };
-
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    if (!formData.username) {
-      setErrorMsg('Please enter your username first.');
+    if (!formData.phone) {
+      setErrorMsg('Please enter your phone number first.');
       return;
     }
     try {
       const response = await fetch('/api/auth/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: formData.username })
+        body: JSON.stringify({ phone: formData.phone })
       });
       const data = await response.json();
       if (!response.ok || !data.success) {
         setErrorMsg(data.error || 'Failed to send reset link.');
       } else {
-        setErrorMsg('Reset link sent!');
+        setErrorMsg('Reset link sent to your phone!');
       }
     } catch (err) {
       setErrorMsg('Network error.');
@@ -172,14 +122,12 @@ const AuthModal = () => {
 
         <div className="auth-header">
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', margin: '0 0 0.5rem 0' }}>
-            {isLogin ? 'Welcome Back' : (otpStep ? 'Verify Phone' : 'Create Account')}
+            {isLogin ? 'Welcome Back' : 'Create Account'}
           </h2>
           <p style={{ color: 'var(--color-text-light)' }}>
             {isLogin 
               ? 'Sign in to access your orders and wishlist.' 
-              : (otpStep 
-                  ? `Enter the OTP sent to ${formData.phone}` 
-                  : 'Join us to save your favorite fragrances.')}
+              : 'Join us to save your favorite fragrances.'}
           </p>
         </div>
 
@@ -189,119 +137,75 @@ const AuthModal = () => {
           </div>
         )}
 
-        {!otpStep && (
-          <div className="auth-tabs">
-            <button 
-              type="button"
-              className={`auth-tab ${isLogin ? 'active' : ''}`} 
-              onClick={() => { setIsLogin(true); setErrorMsg(''); }}
-            >
-              Login
-            </button>
-            <button 
-              type="button"
-              className={`auth-tab ${!isLogin ? 'active' : ''}`} 
-              onClick={() => { setIsLogin(false); setErrorMsg(''); }}
-            >
-              Sign Up
-            </button>
-          </div>
-        )}
+        <div className="auth-tabs">
+          <button 
+            type="button"
+            className={`auth-tab ${isLogin ? 'active' : ''}`} 
+            onClick={() => { setIsLogin(true); setErrorMsg(''); }}
+          >
+            Login
+          </button>
+          <button 
+            type="button"
+            className={`auth-tab ${!isLogin ? 'active' : ''}`} 
+            onClick={() => { setIsLogin(false); setErrorMsg(''); }}
+          >
+            Sign Up
+          </button>
+        </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          {otpStep ? (
-            <div className="auth-input-wrapper">
-              <Key size={18} className="auth-icon" />
-              <input 
-                type="text" 
-                placeholder="Enter OTP Code" 
-                value={otpCode}
-                onChange={e => setOtpCode(e.target.value)}
-                maxLength="6"
-                required 
-                style={{ letterSpacing: '0.25em', textAlign: 'center', paddingLeft: '1rem' }}
-              />
-            </div>
-          ) : (
-            <>
-              {!isLogin && (
-                <div className="auth-input-group row">
-                  <div className="auth-input-wrapper">
-                    <User size={18} className="auth-icon" />
-                    <input type="text" name="firstName" placeholder="First Name" required value={formData.firstName} onChange={handleInputChange} />
-                  </div>
-                  <div className="auth-input-wrapper">
-                    <User size={18} className="auth-icon" />
-                    <input type="text" name="lastName" placeholder="Last Name" required value={formData.lastName} onChange={handleInputChange} />
-                  </div>
-                </div>
-              )}
-              
+          {!isLogin && (
+            <div className="auth-input-group row">
               <div className="auth-input-wrapper">
                 <User size={18} className="auth-icon" />
-                <input type="text" name="username" placeholder="Username" required value={formData.username} onChange={handleInputChange} />
+                <input type="text" name="firstName" placeholder="First Name" required value={formData.firstName} onChange={handleInputChange} />
               </div>
-
-              {!isLogin && (
-                <div className="auth-input-wrapper">
-                  <Phone size={18} className="auth-icon" />
-                  <input 
-                    type="tel" 
-                    name="phone"
-                    placeholder="Phone Number" 
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    required 
-                  />
-                </div>
-              )}
-
               <div className="auth-input-wrapper">
-                <Lock size={18} className="auth-icon" />
-                <input type="password" name="password" placeholder="Password" required value={formData.password} onChange={handleInputChange} />
+                <User size={18} className="auth-icon" />
+                <input type="text" name="lastName" placeholder="Last Name" required value={formData.lastName} onChange={handleInputChange} />
               </div>
+            </div>
+          )}
 
-              {isLogin && (
-                <div className="auth-forgot-password">
-                  <a href="#" onClick={handleForgotPassword}>Forgot your password?</a>
-                </div>
-              )}
-            </>
+          <div className="auth-input-wrapper">
+            <Phone size={18} className="auth-icon" />
+            <input 
+              type="tel" 
+              name="phone"
+              placeholder="Phone Number" 
+              value={formData.phone}
+              onChange={handleInputChange}
+              required 
+            />
+          </div>
+
+          <div className="auth-input-wrapper">
+            <Lock size={18} className="auth-icon" />
+            <input type="password" name="password" placeholder="Password" required value={formData.password} onChange={handleInputChange} />
+          </div>
+
+          {isLogin && (
+            <div className="auth-forgot-password">
+              <a href="#" onClick={handleForgotPassword}>Forgot your password?</a>
+            </div>
           )}
 
           <button type="submit" className="btn-primary auth-submit" disabled={isSubmitting}>
             {isSubmitting 
               ? 'Processing...' 
-              : (isLogin ? 'Sign In' : (otpStep ? 'Verify & Create Account' : 'Sign Up'))}
+              : (isLogin ? 'Sign In' : 'Sign Up')}
           </button>
         </form>
 
-        {!otpStep && (
-          <div className="auth-footer">
-            <p>
-              {isLogin ? "Don't have an account? " : "Already have an account? "}
-              <a href="#" onClick={(e) => { e.preventDefault(); setIsLogin(!isLogin); setErrorMsg(''); }}>
-                {isLogin ? 'Sign up here' : 'Sign in here'}
-              </a>
-            </p>
-          </div>
-        )}
-        
-        {otpStep && (
-          <div className="auth-footer">
-            <p>
-              Didn't receive the code?{' '}
-              <a href="#" onClick={handleResendOTP}>
-                Resend OTP
-              </a>
-            </p>
-            <p style={{ marginTop: '0.5rem' }}>
-              <a href="#" onClick={(e) => { e.preventDefault(); setOtpStep(false); setErrorMsg(''); }}>
-                Change Phone Number
-              </a>
-            </p>
-          </div>
-        )}
+        <div className="auth-footer">
+          <p>
+            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            <a href="#" onClick={(e) => { e.preventDefault(); setIsLogin(!isLogin); setErrorMsg(''); }}>
+              {isLogin ? 'Sign up here' : 'Sign in here'}
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

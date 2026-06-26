@@ -7,7 +7,7 @@ import './Navbar.css';
 const Navbar = ({ data }) => {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { cartCount, setIsCartOpen, wishlistItems, setIsWishlistOpen, setIsAuthOpen } = useStore();
+  const { cartCount, setIsCartOpen, wishlistItems, setIsWishlistOpen, setIsAuthOpen, isAuthenticated, logout } = useStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,7 +55,15 @@ const Navbar = ({ data }) => {
               <ShoppingCart size={20} />
               {cartCount > 0 && <span className="badge">{cartCount}</span>}
             </button>
-            <button aria-label="User" onClick={() => setIsAuthOpen(true)}><User size={20} /></button>
+            {isAuthenticated ? (
+              <button aria-label="Sign Out" onClick={logout} title="Sign Out">
+                <User size={20} fill="var(--color-white)" />
+              </button>
+            ) : (
+              <button aria-label="Sign In" onClick={() => setIsAuthOpen(true)} title="Sign In">
+                <User size={20} />
+              </button>
+            )}
             <button aria-label="Menu" onClick={() => setIsMenuOpen(true)}><Menu size={24} /></button>
           </div>
         </div>

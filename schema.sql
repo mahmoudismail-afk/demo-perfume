@@ -39,12 +39,12 @@ CREATE TABLE IF NOT EXISTS fragrance_profiles (
 CREATE TABLE IF NOT EXISTS customers (
   id TEXT PRIMARY KEY,
   tenant_id TEXT NOT NULL,
-  email TEXT NOT NULL,
   first_name TEXT,
   last_name TEXT,
-  phone TEXT,
+  phone TEXT NOT NULL,
+  password_hash TEXT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE (tenant_id, email)
+  UNIQUE (tenant_id, phone)
 );
 
 -- 3. PROMOTIONS

@@ -144,7 +144,7 @@ const AdminDashboard = () => {
               {products.map(product => (
                 <tr key={product.id}>
                   <td>
-                    <img src={product.image} alt={product.name} className="admin-table-image" />
+                    <img src={product.image} alt={product.name} className="admin-table-image" loading="lazy" />
                   </td>
                   <td>
                     <strong>{product.name}</strong>

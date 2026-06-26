@@ -46,7 +46,7 @@ const BestSellers = ({ data }) => {
                   >
                     <Heart size={20} fill={wishlistItems.includes(product.id) ? "var(--color-black)" : "none"} />
                   </button>
-                  <img src={product.image} alt={product.name} className="product-image" />
+                  <img src={product.image} alt={product.name} className="product-image" loading="lazy" />
                 </div>
                 
                 <div className="product-info" onClick={() => openProductModal(product)} style={{ cursor: 'pointer' }}>

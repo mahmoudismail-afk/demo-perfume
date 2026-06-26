@@ -284,6 +284,129 @@ async function onRequestPost(context) {
 }
 __name(onRequestPost, "onRequestPost");
 __name2(onRequestPost, "onRequestPost");
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+__name(hashPassword, "hashPassword");
+__name2(hashPassword, "hashPassword");
+async function onRequestPost2(context) {
+  try {
+    const body = await context.request.json();
+    const { phone, password } = body;
+    if (!phone || !password) {
+      return new Response(JSON.stringify({ success: false, error: "Phone and password are required" }), { status: 400 });
+    }
+    const tenantId = "jamaludeen-perfumes";
+    const passwordHash = await hashPassword(password);
+    const customer = await context.env.DB.prepare(
+      "SELECT id, first_name, last_name, phone FROM customers WHERE tenant_id = ? AND phone = ? AND password_hash = ?"
+    ).bind(tenantId, phone, passwordHash).first();
+    if (!customer) {
+      return new Response(JSON.stringify({ success: false, error: "Invalid phone number or password" }), { status: 401 });
+    }
+    const token = await index_default.sign(
+      {
+        id: customer.id,
+        phone: customer.phone,
+        role: "customer",
+        exp: Math.floor(Date.now() / 1e3) + 30 * 24 * 60 * 60
+        // 30 days
+      },
+      context.env.JWT_SECRET
+    );
+    return new Response(JSON.stringify({ success: true, token }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ success: false, error: "Login failed", details: error.message }), { status: 500 });
+  }
+}
+__name(onRequestPost2, "onRequestPost2");
+__name2(onRequestPost2, "onRequestPost");
+async function onRequestGet(context) {
+  try {
+    const authHeader = context.request.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), { status: 401 });
+    }
+    const token = authHeader.split(" ")[1];
+    const isValid = await index_default.verify(token, context.env.JWT_SECRET);
+    if (!isValid) {
+      return new Response(JSON.stringify({ success: false, error: "Invalid token" }), { status: 401 });
+    }
+    const { payload } = index_default.decode(token);
+    if (payload.role !== "customer") {
+      return new Response(JSON.stringify({ success: false, error: "Not a customer" }), { status: 403 });
+    }
+    const customer = await context.env.DB.prepare(
+      "SELECT id, first_name, last_name, phone FROM customers WHERE id = ?"
+    ).bind(payload.id).first();
+    if (!customer) {
+      return new Response(JSON.stringify({ success: false, error: "Customer not found" }), { status: 404 });
+    }
+    return new Response(JSON.stringify({ success: true, customer }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ success: false, error: "Failed to fetch profile", details: error.message }), { status: 500 });
+  }
+}
+__name(onRequestGet, "onRequestGet");
+__name2(onRequestGet, "onRequestGet");
+async function hashPassword2(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+__name(hashPassword2, "hashPassword2");
+__name2(hashPassword2, "hashPassword");
+async function onRequestPost3(context) {
+  try {
+    const body = await context.request.json();
+    const { firstName, lastName, phone, password } = body;
+    if (!phone || !password) {
+      return new Response(JSON.stringify({ success: false, error: "Phone and password are required" }), { status: 400 });
+    }
+    const tenantId = "jamaludeen-perfumes";
+    const customerId = Date.now().toString();
+    const passwordHash = await hashPassword2(password);
+    const existing = await context.env.DB.prepare(
+      "SELECT id FROM customers WHERE tenant_id = ? AND phone = ?"
+    ).bind(tenantId, phone).first();
+    if (existing) {
+      return new Response(JSON.stringify({ success: false, error: "Phone number already registered" }), { status: 409 });
+    }
+    await context.env.DB.prepare(
+      "INSERT INTO customers (id, tenant_id, first_name, last_name, phone, password_hash) VALUES (?, ?, ?, ?, ?, ?)"
+    ).bind(customerId, tenantId, firstName || "", lastName || "", phone, passwordHash).run();
+    const token = await index_default.sign(
+      {
+        id: customerId,
+        phone,
+        role: "customer",
+        exp: Math.floor(Date.now() / 1e3) + 30 * 24 * 60 * 60
+        // 30 days
+      },
+      context.env.JWT_SECRET
+    );
+    return new Response(JSON.stringify({ success: true, token }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ success: false, error: "Signup failed", details: error.message }), { status: 500 });
+  }
+}
+__name(onRequestPost3, "onRequestPost3");
+__name2(onRequestPost3, "onRequestPost");
 var withAuth = /* @__PURE__ */ __name2((handler) => async (context) => {
   const { request, env } = context;
   const authHeader = request.headers.get("Authorization");
@@ -319,7 +442,7 @@ var withAuth = /* @__PURE__ */ __name2((handler) => async (context) => {
     });
   }
 }, "withAuth");
-var onRequestGet = withAuth(async (context) => {
+var onRequestGet2 = withAuth(async (context) => {
   const { env, data: { tenantId } } = context;
   const query = `
     SELECT pv.sku, pv.size, pv.stock_level, pv.low_stock_threshold, p.name 
@@ -360,7 +483,7 @@ var onRequestPut = withAuth(async (context) => {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 });
-var onRequestPost2 = withAuth(async (context) => {
+var onRequestPost4 = withAuth(async (context) => {
   const { request, env, data: { tenantId } } = context;
   try {
     const { promoCode } = await request.json();
@@ -388,7 +511,7 @@ var onRequestPost2 = withAuth(async (context) => {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 });
-var onRequestGet2 = withAuth(async (context) => {
+var onRequestGet3 = withAuth(async (context) => {
   const { env, data: { tenantId } } = context;
   const query = `
     SELECT 
@@ -414,15 +537,15 @@ var onRequestGet2 = withAuth(async (context) => {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 });
-async function onRequestGet3(context) {
+async function onRequestGet4(context) {
   const { results } = await context.env.DB.prepare("SELECT * FROM products").all();
   return new Response(JSON.stringify(results), {
     headers: { "Content-Type": "application/json" }
   });
 }
-__name(onRequestGet3, "onRequestGet3");
-__name2(onRequestGet3, "onRequestGet");
-async function onRequestPost3(context) {
+__name(onRequestGet4, "onRequestGet4");
+__name2(onRequestGet4, "onRequestGet");
+async function onRequestPost5(context) {
   const product = await context.request.json();
   const id = product.id || Date.now().toString();
   await context.env.DB.prepare(
@@ -432,8 +555,8 @@ async function onRequestPost3(context) {
     headers: { "Content-Type": "application/json" }
   });
 }
-__name(onRequestPost3, "onRequestPost3");
-__name2(onRequestPost3, "onRequestPost");
+__name(onRequestPost5, "onRequestPost5");
+__name2(onRequestPost5, "onRequestPost");
 async function onRequestPut2(context) {
   const product = await context.request.json();
   await context.env.DB.prepare(
@@ -464,11 +587,32 @@ var routes = [
     modules: [onRequestPost]
   },
   {
+    routePath: "/api/auth/login",
+    mountPath: "/api/auth",
+    method: "POST",
+    middlewares: [],
+    modules: [onRequestPost2]
+  },
+  {
+    routePath: "/api/auth/me",
+    mountPath: "/api/auth",
+    method: "GET",
+    middlewares: [],
+    modules: [onRequestGet]
+  },
+  {
+    routePath: "/api/auth/signup",
+    mountPath: "/api/auth",
+    method: "POST",
+    middlewares: [],
+    modules: [onRequestPost3]
+  },
+  {
     routePath: "/api/inventory/low-stock",
     mountPath: "/api/inventory",
     method: "GET",
     middlewares: [],
-    modules: [onRequestGet]
+    modules: [onRequestGet2]
   },
   {
     routePath: "/api/orders/status",
@@ -482,14 +626,14 @@ var routes = [
     mountPath: "/api/promotions",
     method: "POST",
     middlewares: [],
-    modules: [onRequestPost2]
+    modules: [onRequestPost4]
   },
   {
     routePath: "/api/customers",
     mountPath: "/api/customers",
     method: "GET",
     middlewares: [],
-    modules: [onRequestGet2]
+    modules: [onRequestGet3]
   },
   {
     routePath: "/api/products",
@@ -503,14 +647,14 @@ var routes = [
     mountPath: "/api",
     method: "GET",
     middlewares: [],
-    modules: [onRequestGet3]
+    modules: [onRequestGet4]
   },
   {
     routePath: "/api/products",
     mountPath: "/api",
     method: "POST",
     middlewares: [],
-    modules: [onRequestPost3]
+    modules: [onRequestPost5]
   },
   {
     routePath: "/api/products",

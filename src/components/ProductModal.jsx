@@ -30,7 +30,7 @@ const ProductModal = () => {
         <div className="modal-body">
           <div className="modal-image-container">
             {selectedProduct.badge && <span className="product-badge">{selectedProduct.badge}</span>}
-            <img src={selectedProduct.image} alt={selectedProduct.name} className="modal-image" />
+            <img src={selectedProduct.image} alt={selectedProduct.name} className="modal-image" loading="lazy" />
           </div>
           
           <div className="modal-info">

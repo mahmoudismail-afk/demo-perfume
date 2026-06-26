@@ -15,7 +15,7 @@ const Collections = ({ data }) => {
         <div className="collections-grid fade-in-section">
           {data.items.map((item, index) => (
             <Link to={`/collections/${item.id}`} key={item.id} className={`collection-card ${index === 2 || index === 3 ? 'full-width' : ''}`}>
-              <img src={item.image} alt={item.title} className="collection-image" />
+              <img src={item.image} alt={item.title} className="collection-image" loading="lazy" />
               <div className="collection-overlay">
                 <h3 className="collection-title">{item.title}</h3>
               </div>
