@@ -1,4 +1,4 @@
-name = "demo"
+name = "demo-perfume"
 pages_build_output_dir = "dist"
 compatibility_date = "2024-03-20"
 
@@ -6,3 +6,8 @@ compatibility_date = "2024-03-20"
 binding = "DB"
 database_name = "demo-perfume"
 database_id = "f0302131-e829-4254-a052-6b4846627870"
+
+[vars]
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "password"
+JWT_SECRET = "production_jwt_secret_key_12345"
