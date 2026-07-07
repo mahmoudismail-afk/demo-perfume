@@ -1,7 +1,7 @@
 {
   "site": {
-    "name": "JAMALUDEEN",
-    "fullName": "JAMALUDEEN PERFUMES",
+    "name": "Demo",
+    "fullName": "Demo",
     "tagline": "SIGNATURE SCENTS",
     "footerText": "Crafting exceptional fragrances that capture the essence of elegance."
   },
@@ -93,7 +93,7 @@
   "about": {
     "title": "The Art of Fragrance",
     "paragraphs": [
-      "At Jamaludeen Perfumes, we believe that every scent tells a story. Our master perfumers craft each fragrance with precision and passion, using only the finest ingredients sourced from around the world.",
+      "At Demo, we believe that every scent tells a story. Our master perfumers craft each fragrance with precision and passion, using only the finest ingredients sourced from around the world.",
       "From the first spritz to the lasting impression, our perfumes are designed to evoke emotions, create memories, and express your unique personality."
     ],
     "buttonText": "Learn More About Us",
